@@ -63,6 +63,7 @@ function generateCatalog()
     catalog.push(catalog_entry);
   }
   
+
   var blob = new Blob([generateCSV(header, catalog)], {type: "text/plain;charset=utf-8"});
   saveAs(blob, "top_wood.catalog.csv");
 }
@@ -80,16 +81,13 @@ function generateCSV(header, data)
       header_label = header[index_header];
       if (!(header_label in entry))
       {
-        content += '""';
+        content += '"";';
       } else {
-        content += '"' + entry[header_label] + '"';
-      }
-      if( index_data+1 != data.length ) {
-        content += ';';
+        content += '"' + entry[header_label] + '";';
       }
     }
 
-    content += "\n";
+    content = content.slice(0,-1) + "\n";
   }  
   
   return content;
@@ -228,7 +226,8 @@ function extractPrices(product)
       });  
     }
     // Now we compute the price for 1 unit
-    product_price = prices[0].price / (1 - (parseFloat(prices[0].discount) / 100));
+    product_price = ""+ parseFloat(prices[0].price) / (1 - (parseFloat(prices[0].discount) / 100));
+    product_price = product_price.replace('.',',');
   }else{
     product_price = extractPrice(product.querySelector('[itemprop=price]').innerText);
   }
@@ -249,7 +248,7 @@ function extractPrices(product)
 function extractPrice(text)
 {
   res = text.match(/(\d*(?:.|,)?\d+)/);
-  return parseFloat(res[1].replace('.',','));
+  return res[1];
 }
 
 /**
